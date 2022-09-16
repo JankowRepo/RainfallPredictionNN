@@ -4,12 +4,12 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, Normalizer, LabelEncoder
+from sklearn.preprocessing import MinMaxScaler, Normalizer, LabelEncoder, StandardScaler
 from imblearn.combine import SMOTETomek
 from scipy import stats
 
 
-def choose_data(balanced, split_size):
+def choose_data(balanced, split_size,show_number_of_data):
     df = pd.read_csv('weatherAUS.csv')
 
     df = df.drop(['Location', 'Temp9am', 'Date', 'Sunshine',
@@ -26,6 +26,10 @@ def choose_data(balanced, split_size):
 
     splitted_data = data_split(X, y, balanced, split_size)
 
+    if show_number_of_data:
+        print("Train data:", len(splitted_data[0]))
+        print("Test data:", len(splitted_data[1]))
+
     return splitted_data
 
 
@@ -39,8 +43,5 @@ def data_split(X, y, balanced, split_size):
         X_train, y_train = SMOTETomek(sampling_strategy={0: np.count_nonzero(y_train.values == 0),
                                                          1: int(np.count_nonzero(y_train.values == 0)/2)
                                                          }).fit_resample(X_train, y_train)
-
-    print("Train data:", len(X_train))
-    print("Test data:", len(X_test))
 
     return [X_train, X_test, y_train, y_test]
